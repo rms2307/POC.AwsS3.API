@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["POC.AwsS3.API/POC.AwsS3.API.csproj", "POC.AwsS3.API/"]
-RUN dotnet restore "POC.AwsS3.API/POC.AwsS3.API.csproj"
+COPY ["POC.AWS.S3.API/POC.AWS.S3.API.csproj", "POC.AWS.S3.API/"]
+RUN dotnet restore "POC.AWS.S3.API/POC.AWS.S3.API.csproj"
 COPY . .
-WORKDIR "/src/POC.AwsS3.API"
-RUN dotnet build "POC.AwsS3.API.csproj" -c Release -o /app/build
+WORKDIR "/src/POC.AWS.S3.API"
+RUN dotnet build "POC.AWS.S3.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "POC.AwsS3.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "POC.AWS.S3.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "POC.AwsS3.API.dll"]
+ENTRYPOINT ["dotnet", "POC.AWS.S3.API.dll"]
