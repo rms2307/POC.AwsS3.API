@@ -3,6 +3,6 @@
     public interface IFileStorageService
     {
         public Task UploadFile(IFormFile file);
-        public Task DownloadFile(string fileId);
+        public Task DownloadFile(string fileKey);
     }
 }

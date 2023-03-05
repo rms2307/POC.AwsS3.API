@@ -5,8 +5,9 @@ using POC.AWS.S3.API.Services.Interfaces;
 
 namespace POC.AWS.S3.API.Infra
 {
-    public class AwsS3Service: IFileStorageService
+    public class AwsS3Service : IFileStorageService
     {
+        private const string BUCKET_NAME = "poc-awss3-dotnet";
         private readonly IConfiguration _configuration;
 
         public AwsS3Service(IConfiguration configuration)
@@ -16,21 +17,21 @@ namespace POC.AWS.S3.API.Infra
 
         public async Task UploadFile(IFormFile file)
         {
-            using (var client = GetClient())
+            using (AmazonS3Client client = GetClient())
             {
-                using (var ms = new MemoryStream())
+                using (MemoryStream ms = new())
                 {
                     file.CopyTo(ms);
 
-                    var uploadRequest = new TransferUtilityUploadRequest
+                    TransferUtilityUploadRequest uploadRequest = new()
                     {
                         InputStream = ms,
                         Key = file.FileName,
-                        BucketName = "poc-awss3-dotnet",
+                        BucketName = BUCKET_NAME,
                         CannedACL = S3CannedACL.PublicRead
                     };
 
-                    var fileTransferUtility = new TransferUtility(client);
+                    TransferUtility fileTransferUtility = new(client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
             }
@@ -38,7 +39,17 @@ namespace POC.AWS.S3.API.Infra
 
         public async Task DownloadFile(string fileId)
         {
-            throw new NotImplementedException();
+            using (AmazonS3Client client = GetClient())
+            {
+                TransferUtilityDownloadRequest request = new()
+                {
+                    BucketName = BUCKET_NAME,
+                    FilePath = "arq_teste_sales.png"
+                };
+
+                TransferUtility fileTransferUtility = new(client);
+                await fileTransferUtility.DownloadAsync(request);
+            }
         }
 
         private AmazonS3Client GetClient()
